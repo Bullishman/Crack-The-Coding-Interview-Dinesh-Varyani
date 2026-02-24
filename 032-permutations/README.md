@@ -1,115 +1,105 @@
-This code generates all possible permutations of a list of numbers using a recursive technique called **backtracking**, which is a form of Depth-First Search (DFS).
+# 32. Permutations
 
-Let's break down the code line by line using a simple example.
+**Difficulty**: Medium
 
-**Example:** `nums = [1, 2, 3]`
+**Topics**: Array, Backtracking
 
-The goal is to generate all possible orderings: `[1,2,3]`, `[1,3,2]`, `[2,1,3]`, `[2,3,1]`, `[3,1,2]`, and `[3,2,1]`.
+**Link**: https://leetcode.com/problems/permutations
+
+This code generates all possible **permutations** of a list of numbers using **recursion (Depth-First Search)**. The core idea is to pick a number, remove it from the available pool, add it to your current chain, and repeat until no numbers are left.
+
+### Line-by-Line Breakdown
+
+#### The Setup (`permute` function)
+
+```python
+def permute(self, nums: List[int]) -> List[List[int]]:
+    ans = []
+```
+
+* **Initialize Result:** We create an empty list `ans` to store our final list of permutations (e.g., `[[1,2], [2,1]]`).
+
+```python
+    self.dfs(nums, [], ans)
+    return ans
+```
+
+* **Kickoff:** We call the helper function `dfs`.
+* `nums`: The pool of available numbers (initially full).
+* `[]`: The current path/permutation we are building (initially empty).
+* `ans`: The reference to the result list to store completed paths.
+
+
+* **Return:** Once `dfs` finishes exploring all paths, we return the filled `ans`.
+
+#### The Recursive Engine (`dfs` function)
+
+```python
+def dfs(self, nums, temp_nums, ans):
+    if not nums:
+        ans.append(temp_nums)
+        return
+```
+
+* **Base Case:** If `nums` is empty (meaning we've used up all available numbers), we have a complete permutation.
+* **Action:** We append the current path (`temp_nums`) to our final answer list `ans`.
+* **Return:** We stop this branch of recursion and go back up.
+
+```python
+    for i in range(len(nums)):
+```
+
+* **Branching:** We loop through the currently available numbers. Each iteration represents a decision: "What if I pick the number at index `i` next?"
+
+```python
+        self.dfs(nums[:i] + nums[i + 1:], temp_nums + [nums[i]], ans)
+```
+
+* **The Recursive Leap:** This line does three critical things at once to set up the *next* step:
+1. **Remove the chosen number:** `nums[:i] + nums[i + 1:]` creates a *new* list that excludes the number at index `i`. This becomes the new "available pool."
+2. **Add to path:** `temp_nums + [nums[i]]` creates a *new* list with the chosen number added to the end.
+3. **Recurse:** It calls `dfs` again with these updated lists.
+
+
 
 ---
 
-### **The Main Function: `permute`**
+### Step-by-Step Execution Map
 
-This is the entry point that sets up the process.
+**Input:** `nums = [1, 2, 3]`
 
-```python
-class Solution:
-    def permute(self, nums: List[int]) -> List[List[int]]:
-```
-This defines the main function `permute` that takes the list of numbers `nums` and is expected to return a list of lists, where each inner list is a unique permutation.
+We will track the "State" as `(Available Numbers, Current Path)`.
 
-```python
-        ans = []
-```
-An empty list `ans` is initialized. This list will be used to store all the complete permutations as we find them.
+| Step | Action / Decision | `nums` (Available) | `temp_nums` (Current Path) | Note |
+| --- | --- | --- | --- | --- |
+| **1** | **Initial Call** | `[1, 2, 3]` | `[]` | Start DFS |
+| **2** | Loop `i=0` (Pick 1) | `[2, 3]` | `[1]` | Recurse |
+| **3** |   Loop `i=0` (Pick 2) | `[3]` | `[1, 2]` | Recurse |
+| **4** |     Loop `i=0` (Pick 3) | `[]` | `[1, 2, 3]` | Recurse |
+| **5** |     **Base Case** | `[]` | `[1, 2, 3]` | **Add to `ans**`, Return |
+| **6** |   Loop `i=1` (Pick 3) | `[2]` | `[1, 3]` | Back in Step 2 context |
+| **7** |     Loop `i=0` (Pick 2) | `[]` | `[1, 3, 2]` | Recurse |
+| **8** |     **Base Case** | `[]` | `[1, 3, 2]` | **Add to `ans**`, Return |
+| **9** | Loop `i=1` (Pick 2) | `[1, 3]` | `[2]` | Back in Step 1 context |
+| **10** |   Loop `i=0` (Pick 1) | `[3]` | `[2, 1]` | Recurse |
+| **11** |     Loop `i=0` (Pick 3) | `[]` | `[2, 1, 3]` | Recurse |
+| **12** |     **Base Case** | `[]` | `[2, 1, 3]` | **Add to `ans**`, Return |
 
-```python
-        self.dfs(nums, [], ans)
-```
-This is the initial call to our recursive helper function, `dfs`. It "kicks off" the search for permutations.
-* `nums`: We pass the full original list `[1, 2, 3]` as the pool of available numbers to use.
-* `[]`: We pass an empty list `[]` because our current permutation is just beginning; we haven't picked any numbers yet.
-* `ans`: We pass the `ans` list so the helper function can add results to it.
+*(The process continues similarly for the branch starting with 3)*
 
-```python
-        return ans
-```
-After the `dfs` function has run and completely explored all possibilities, the `ans` list will be full. This line returns that final list.
+### Visualizing the Data Flow
 
----
+The most important part to understand is how the arguments change in the recursive call:
 
-### **The Recursive Helper Function: `dfs`**
+If `nums` is `[1, 2, 3]` and `i = 1` (we pick "2"):
 
-This is where the real magic happens. `dfs` stands for Depth-First Search. Think of it as a worker that explores one path at a time.
+1. **New Nums:** `nums[:1]` is `[1]`. `nums[2:]` is `[3]`.
+* Result: `[1, 3]` (2 is removed).
 
-```python
-    def dfs(self, nums, temp_nums, ans):
-```
-* `nums`: The numbers that are *still available* to be picked.
-* `temp_nums`: The permutation we are *currently building*.
-* `ans`: The final list to store completed permutations.
 
-#### **The Base Case (When to stop a path)**
+2. **New Path:** `temp_nums` was `[]`. `[nums[1]]` is `[2]`.
+* Result: `[2]` (2 is added).
 
-```python
-        if not nums:
-            ans.append(temp_nums)
-            return
-```
-This is the **base case** of the recursion. It checks if the list of available numbers (`nums`) is empty.
-* If `nums` is empty, it means we have successfully used every number from the original list to build the permutation currently in `temp_nums`.
-* `ans.append(temp_nums)`: The complete permutation `temp_nums` is added to our final `ans` list.
-* `return`: We stop going down this path and return to the previous function call to explore other options.
 
-#### **The Recursive Step (Exploring all choices)**
 
-```python
-        for i in range(len(nums)):
-```
-If the list of available numbers is not empty, we loop through every number `nums[i]` that is currently available. For each of these numbers, we will try adding it to our permutation.
-
-```python
-            self.dfs(nums[:i] + nums[i + 1:], temp_nums + [nums[i]], ans)
-```
-This is the recursive call where the function calls itself to go one level deeper. Let's break down the arguments it passes:
-
-1.  **`nums[:i] + nums[i + 1:]`**: This is the "choose" step. It creates a **new list** of available numbers by removing the number we just picked (`nums[i]`).
-2.  **`temp_nums + [nums[i]]`**: This is the "explore" step. It creates a **new list** for the current permutation by adding the number we just chose (`nums[i]`) to the end of it.
-3.  **`ans`**: The reference to the results list is passed down.
-
-### **Walkthrough with `nums = [1, 2, 3]`**
-
-Let's trace the first few steps to see how `[1, 2, 3]` and `[1, 3, 2]` are found.
-
-**1. `permute([1, 2, 3])` calls `dfs(nums=[1, 2, 3], temp_nums=[], ans=[])`**
-
-* The `for` loop starts. `i = 0`. The chosen number is `1`.
-* It calls **`dfs(nums=[2, 3], temp_nums=[1], ans=[])`**.
-
-**2. Inside `dfs(nums=[2, 3], temp_nums=[1], ...)`**
-
-* `nums` is not empty. The `for` loop starts.
-* **Path 1: `i = 0`**. The chosen number is `2`.
-    * It calls **`dfs(nums=[3], temp_nums=[1, 2], ans=[])`**.
-        * Inside this call, the `for` loop runs once. `i = 0`. The chosen number is `3`.
-        * It calls **`dfs(nums=[], temp_nums=[1, 2, 3], ans=[])`**.
-            * **BASE CASE HIT!** `nums` is empty.
-            * `ans.append([1, 2, 3])`. Now `ans` is `[[1, 2, 3]]`.
-            * It returns.
-    * The call for `temp_nums=[1, 2]` is now finished with its loop. It returns.
-* **Path 2: `i = 1`**. The chosen number is `3`.
-    * It calls **`dfs(nums=[2], temp_nums=[1, 3], ans=[[1, 2, 3]])`**.
-        * Inside this call, the `for` loop runs once. `i = 0`. The chosen number is `2`.
-        * It calls **`dfs(nums=[], temp_nums=[1, 3, 2], ans=[[1, 2, 3]])`**.
-            * **BASE CASE HIT!** `nums` is empty.
-            * `ans.append([1, 3, 2])`. Now `ans` is `[[1, 2, 3], [1, 3, 2]]`.
-            * It returns.
-    * The call for `temp_nums=[1, 3]` is now finished with its loop. It returns.
-* Now the call for `temp_nums=[1]` is finished. It returns.
-
-**3. Back in the first call `dfs(nums=[1, 2, 3], ...)`**
-
-* The loop continues. `i = 1`. The chosen number is `2`.
-* It calls **`dfs(nums=[1, 3], temp_nums=[2], ...)`** and this entire process repeats, eventually finding the permutations `[2, 1, 3]` and `[2, 3, 1]`.
-
-This continues until all possibilities have been explored and the `ans` list contains all 6 permutations.
+This ensures that deeper levels of the recursion never see the numbers we have already used in the current path.

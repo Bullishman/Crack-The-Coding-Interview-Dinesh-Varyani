@@ -1,104 +1,65 @@
-This code solves the "Combination Sum" problem using a recursive backtracking algorithm, which is a form of Depth-First Search (DFS). The goal is to find all unique combinations of numbers from the `candidates` list that sum up to the `target`. Numbers can be used multiple times.
+# 33. Combination Sum
 
-Let's use a standard example to trace this corrected code.
-**Example:** `candidates = [2, 3, 6, 7]`, `target = 7`
+**Difficulty**: Medium
 
----
+**Topics**: Array, Backtracking
 
-### **1. The `combinationSum` (Outer) Function**
+**Link**: https://leetcode.com/problems/combination-sum
 
-This function sets up the process.
+I love the tabular format! It is a fantastic way to visualize state changes in algorithms.
 
-```python
-class Solution:
-    def combinationSum(self, candidates: List[int], target: int) -> List[List[int]]:
-```
-This defines the main function that takes the `candidates` and the `target`.
+This code is a classic implementation of a **Backtracking algorithm** (using Depth-First Search) to solve the "Combination Sum" problem. Here is the line-by-line breakdown, followed by a step-by-step execution map styled like your table.
 
-```python
-        results = []
-```
-An empty list `results` is created. This will be accessible by the nested `dfs` function and will be used to store all the valid combinations we find.
+### Line-by-Line Breakdown
 
-```python
-        # ... dfs function definition ...
-```
-Next, the code defines the helper function `dfs`, which we will analyze in the next section.
+* **`class Solution:`** Standard object-oriented wrapper class, typical for coding platforms like LeetCode.
+* **`def combinationSum(self, candidates: List[int], target: int) -> List[List[int]]:`** The main function. It takes the pool of numbers (`candidates`) and the `target` sum, returning a list of valid combinations.
+* **`results = []`** Initializes an empty list to store all the successful combinations we find.
+* **`def dfs(csum, index, path):`** Defines an inner helper function to perform the recursion.
+* `csum` tracks the *remaining* sum needed to hit the target.
+* `index` keeps track of where we are in the `candidates` array. We pass this forward to prevent duplicate combinations (e.g., finding `[2, 3]` and preventing a later `[3, 2]`).
+* `path` is the current sequence of numbers we have chosen in this specific recursive branch.
 
-```python
-        dfs(target, 0, [])
-```
-This is the **initial call** that starts the entire recursive process.
-* `target` (7): The current sum we need to find is the `target` itself.
-* `0`: We start our search from the beginning of the `candidates` list (index 0).
-* `[]`: The current combination path we're building is empty at the start.
 
-```python
-        return results
-```
-After the initial `dfs` call has explored all possibilities and returned, this line returns the `results` list, which now contains all found combinations.
+* **`if csum < 0:`** **Base Case 1 (Overshoot):** If the remaining sum drops below zero, our current `path` has added up to a number greater than the target.
+* **`return`** Stops this recursive branch. It "backtracks" to the previous state to try a different loop iteration.
+* **`if csum == 0:`** **Base Case 2 (Success):** If the remaining sum is exactly zero, we have successfully found a combination!
+* **`results.append(path)`** Adds the successful combination (`path`) to our `results` list.
+* **`return`** Stops exploring this branch further, as adding any more numbers would exceed the target.
+* **`for i in range(index, len(candidates)):`** Iterates through the `candidates`. Starting from `index` (instead of `0`) ensures we only look at the current number or numbers *after* it, which is how the algorithm avoids building duplicate sets.
+* **`dfs(csum - candidates[i], i, path + [candidates[i]])`** The core recursive call:
+* `csum - candidates[i]`: Subtracts the chosen number from the remaining target.
+* `i`: Passes the *same* index we are currently on. This allows the algorithm to reuse the same number an unlimited number of times.
+* `path + [candidates[i]]`: Creates a *brand new list* by taking the current sequence and adding the new number. Because we create a new list in memory here, we don't need a `path.pop()` statement later to clean up the state.
+
+
+* **`dfs(target, 0, [])`** The initial trigger for the recursion. We start with the full `target`, at index `0`, with an empty sequence `[]`.
+* **`return results`** Once all recursive branches finish, this returns the fully populated list of combinations.
 
 ---
 
-### **2. The `dfs` (Inner) Helper Function**
+### Step-by-Step Execution Map
 
-This is the recursive worker that explores all paths.
+To see exactly how the variables mutate, let's run a trace using a simple example:
+**Input:** `candidates = [2, 3]`, `target = 5`
 
-```python
-        def dfs(csum, index, path):
-```
-* `csum`: The **c**urrent **sum** we still need to make. It starts at `target` and decreases.
-* `index`: The starting index in the `candidates` list for the current loop. This is a clever trick to avoid duplicate combinations (e.g., generating `[2, 3]` and later `[3, 2]`).
-* `path`: The list representing the combination of numbers we have chosen so far on the current path.
+| Current State `dfs(csum, index, path)` | Loop `i` | `candidate` | Base Case Check | Action / Next Step |
+| --- | --- | --- | --- | --- |
+| `dfs(5, 0, [])` | 0 | 2 | None | Recurse: `dfs(3, 0, [2])` |
+| `dfs(3, 0, [2])` | 0 | 2 | None | Recurse: `dfs(1, 0, [2, 2])` |
+| `dfs(1, 0, [2, 2])` | 0 | 2 | None | Recurse: `dfs(-1, 0, [2, 2, 2])` |
+| `dfs(-1, 0, [2, 2, 2])` | - | - | **`csum < 0`** | **Return (Backtrack)** |
+| `dfs(1, 0, [2, 2])` | 1 | 3 | None | Recurse: `dfs(-2, 1, [2, 2, 3])` |
+| `dfs(-2, 1, [2, 2, 3])` | - | - | **`csum < 0`** | **Return (Backtrack)** |
+| `dfs(3, 0, [2])` | 1 | 3 | None | Recurse: `dfs(0, 1, [2, 3])` |
+| `dfs(0, 1, [2, 3])` | - | - | **`csum == 0`** | **Save `[2, 3]`, Return** |
+| `dfs(5, 0, [])` | 1 | 3 | None | Recurse: `dfs(2, 1, [3])` |
+| `dfs(2, 1, [3])` | 1 | 3 | None | Recurse: `dfs(-1, 1, [3, 3])` |
+| `dfs(-1, 1, [3, 3])` | - | - | **`csum < 0`** | **Return (Backtrack)** |
+| *(Execution Finishes)* | - | - | All loops done | **Return `[[2, 3]]**` |
 
-#### **The Base Cases (Stopping Conditions)**
+---
 
-```python
-            if csum < 0:
-                return
-```
-**Base Case 1 (Failure):** If `csum` becomes negative, it means the last number we added was too large and we have "overshot" the target. There's no point in continuing down this path, so we simply `return` and backtrack.
+Using `path + [candidates[i]]` is clean and easy to read, but creating a new list on every single recursive call uses a lot of extra memory under the hood.
 
-```python
-            if csum == 0:
-                results.append(path)
-                return
-```
-**Base Case 2 (Success):** If `csum` is exactly `0`, we have found a valid combination of numbers that sums perfectly to the original target. We append the current `path` to our final `results` list and `return` to backtrack and look for other solutions.
-
-#### **The Recursive Step (The Loop)**
-
-```python
-            for i in range(index, len(candidates)):
-```
-This loop iterates through the available candidates. Crucially, it starts from `index`, not from 0. This ensures that we only pick the current candidate or candidates that appear *after* it, preventing duplicate combinations.
-
-```python
-                dfs(csum - candidates[i], i, path + [candidates[i]])
-```
-This is the recursive call where the function calls itself to go one level deeper.
-* `csum - candidates[i]`: We pass the remaining sum we need to find.
-* `i`: We pass `i` as the next starting index. **This is key.** By passing `i` (and not `i + 1`), we allow the **same number to be chosen again** in the next step.
-* `path + [candidates[i]]`: We pass a new list representing the current path with our newly chosen candidate `candidates[i]` added to it.
-
-### **Walkthrough with `target = 7`**
-
-1.  **Start:** `dfs(csum=7, index=0, path=[])` is called.
-2.  The loop starts for `i` from `0` to `3`.
-    * **`i = 0` (Pick `2`)**: Calls `dfs(csum=5, index=0, path=[2])`
-        * Inside this new call, loop for `i` from `0` to `3`.
-        * **`i = 0` (Pick `2` again)**: Calls `dfs(csum=3, index=0, path=[2, 2])`
-            * Inside this call, loop for `i` from `0` to `3`.
-            * **`i = 0` (Pick `2` again)**: Calls `dfs(csum=1, index=0, path=[2, 2, 2])`
-            * **`i = 1` (Pick `3`)**: Calls `dfs(csum=0, index=1, path=[2, 2, 3])`
-                * **SUCCESS!** `csum` is 0. `results.append([2, 2, 3])`. It returns.
-            * ... The loop continues but the other numbers are too big and lead to `csum < 0`.
-    * ...The recursion unwinds...
-    * **`i = 1` (Pick `3`)**: Calls `dfs(csum=4, index=1, path=[3])`
-    * ...This path is explored but finds no solutions...
-    * **`i = 2` (Pick `6`)**: Calls `dfs(csum=1, index=2, path=[6])`
-    * ...This path is explored but finds no solutions...
-    * **`i = 3` (Pick `7`)**: Calls `dfs(csum=0, index=3, path=[7])`
-        * **SUCCESS!** `csum` is 0. `results.append([7])`. It returns.
-3.  The initial call to `dfs` finishes.
-4.  The `combinationSum` function returns `results`, which is now `[[2, 2, 3], [7]]`.
+Would you like me to show you the slightly optimized version of this code that uses `.append()` and `.pop()` to reuse the same list in memory?
