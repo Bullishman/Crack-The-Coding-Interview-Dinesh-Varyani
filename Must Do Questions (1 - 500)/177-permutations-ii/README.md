@@ -106,19 +106,19 @@ This imports `Counter` and defines the main class and function.
 
 **`nums` = `[1, 1, 2]`** -> `count` = `{1: 2, 2: 1}`
 
-| Step | `num` (Choice) | `count` map State | Current `path` length | Action | `path` |
-|:---:|:---:|:---|:---:|:---|:---|
-| 1 | `1` | `{1: 2, 2: 1}` | 0 | Use `1`. Decrement count. Call `backtrack()` | `[1]` |
-| 2 | `1` | `{1: 1, 2: 1}` | 1 | Use `1`. Decrement count. Call `backtrack()` | `[1, 1]` |
-| 3 | `1` | `{1: 0, 2: 1}` | 2 | `count[1]` is 0. **Skip.** | `[1, 1]` |
-| 4 | `2` | `{1: 0, 2: 1}` | 2 | Use `2`. Decrement count. Path full. **Append `[1, 1, 2]`** | `[1, 1, 2]` |
-| 5 | backtrack | `{1: 0, 2: 0}` -> `{1: 0, 2: 1}`| 2 | Undoes `2`, returns to step 2 loop | `[1, 1]` |
-| 6 | backtrack | `{1: 0, 2: 1}` -> `{1: 1, 2: 1}`| 1 | Undoes `1`, returns to step 1 loop | `[1]` |
-| 7 | `2` | `{1: 1, 2: 1}` | 1 | Use `2`. Decrement count. Call `backtrack()`| `[1, 2]` |
-| 8 | `1` | `{1: 1, 2: 0}` | 2 | Use `1`. Decrement count. Path full. **Append `[1, 2, 1]`**| `[1, 2, 1]` |
-| 9 | backtrack | `{1: 1, 2: 1}` -> `{1: 2, 2: 1}`| 0 | Undoes `1` completely! | `[]` |
-| 10 | `2` | `{1: 2, 2: 1}` | 0 | Use `2`. Decrement count. Call `backtrack()`| `[2]` |
-| 11 | `1` | `{1: 2, 2: 0}` | 1 | Use `1`. Decrement count. Call `backtrack()`| `[2, 1]` |
-| 12 | `1` | `{1: 1, 2: 0}` | 2 | Use `1`. Decrement count. Path full. **Append `[2, 1, 1]`**| `[2, 1, 1]` |
+| Step | Depth (Call Count) | `num` (Choice) | `count` map State | Current `path` length | Action | `path` |
+|:---:|:---:|:---:|:---|:---:|:---|:---|
+| 1 | 0 | `1` | `{1: 2, 2: 1}` | 0 | Use `1`. Decrement count. Call `backtrack()` | `[1]` |
+| 2 | 1 | `1` | `{1: 1, 2: 1}` | 1 | Use `1`. Decrement count. Call `backtrack()` | `[1, 1]` |
+| 3 | 2 | `1` | `{1: 0, 2: 1}` | 2 | `count[1]` is 0. **Skip.** | `[1, 1]` |
+| 4 | 2 | `2` | `{1: 0, 2: 1}` | 2 | Use `2`. Decrement count. Path full. **Append `[1, 1, 2]`** | `[1, 1, 2]` |
+| 5 | 1 | backtrack | `{1: 0, 2: 0}` -> `{1: 0, 2: 1}`| 2 | Undoes `2`, returns to step 2 loop | `[1, 1]` |
+| 6 | 0 | backtrack | `{1: 0, 2: 1}` -> `{1: 1, 2: 1}`| 1 | Undoes `1`, returns to step 1 loop | `[1]` |
+| 7 | 1 | `2` | `{1: 1, 2: 1}` | 1 | Use `2`. Decrement count. Call `backtrack()`| `[1, 2]` |
+| 8 | 2 | `1` | `{1: 1, 2: 0}` | 2 | Use `1`. Decrement count. Path full. **Append `[1, 2, 1]`**| `[1, 2, 1]` |
+| 9 | 0 | backtrack | `{1: 1, 2: 1}` -> `{1: 2, 2: 1}`| 0 | Undoes `1` completely! | `[]` |
+| 10 | 0 | `2` | `{1: 2, 2: 1}` | 0 | Use `2`. Decrement count. Call `backtrack()`| `[2]` |
+| 11 | 1 | `1` | `{1: 2, 2: 0}` | 1 | Use `1`. Decrement count. Call `backtrack()`| `[2, 1]` |
+| 12 | 2 | `1` | `{1: 1, 2: 0}` | 2 | Use `1`. Decrement count. Path full. **Append `[2, 1, 1]`**| `[2, 1, 1]` |
 
 The function returns the final list containing the 3 unique valid arrays.
